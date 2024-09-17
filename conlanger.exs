@@ -213,6 +213,15 @@ defmodule Conlang do
   "ʔ"  => %{sonority: 01, place: 11, voicing: 0, pulmonic: 1},
   }
 
+  def word do
+    syll_count = Enum.random(1..12)
+
+    Enum.to_list(1..syll_count)
+    |> Enum.reduce([], fn _, acc -> Enum.concat(acc,[Conlang.syllable()]) end)
+    |> Enum.join(".")
+    |> IO.puts()
+  end
+
   def syllable do
     nucleus = @phonemes
     |> Enum.filter(fn {_phoneme, features} -> features[:rounding] == 0 end)
@@ -236,7 +245,6 @@ defmodule Conlang do
 
     [onset, nucleus, coda]
     |> Enum.join("")
-    |> IO.puts()
   end
 
   def sonorance({_character, %{sonority: sonority}}), do: sonority
@@ -244,4 +252,4 @@ defmodule Conlang do
   def cons_count, do: Enum.random(1..3)
 end
 
-Conlang.syllable()
+Conlang.word()
