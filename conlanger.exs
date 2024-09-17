@@ -306,30 +306,37 @@ defmodule Conlang do
   "ɬʼ" => %{sonority: 07, place: 04, voicing: 0, pulmonic: 0},
   }
 
+  def inventory do
+    System.argv()
+    |> Map.new(fn x -> {x, x} end)
+    |> Map.intersect(@phonemes)
+  end
+
   def word do
+    phonemic_inventory = inventory()
     syll_count = Enum.random(1..12)
 
     Enum.to_list(1..syll_count)
-    |> Enum.reduce([], fn _, acc -> Enum.concat(acc,[Conlang.syllable()]) end)
+    |> Enum.reduce([], fn _, acc -> Enum.concat(acc,[Conlang.syllable(phonemic_inventory)]) end)
     |> Enum.join(".")
     |> IO.puts()
   end
 
-  def syllable do
-    nucleus = @phonemes
+  def syllable(phonemic_inventory) do
+    nucleus = phonemic_inventory
     |> Enum.filter(fn {_phoneme, features} -> features[:rounding] == 0 end)
     |> Enum.take_random(Enum.random(1..2))
     |> Enum.map(fn {k, _v} -> k end)
     |> Enum.join("")
 
-    onset = @phonemes
+    onset = phonemic_inventory
     |> Enum.filter(fn {_phoneme, features} -> features[:sonority] < 15 end)
     |> Enum.take_random(Enum.random(0..3))
     |> Enum.sort(&(Conlang.sonorance(&1) <= Conlang.sonorance(&2)))
     |> Enum.map(fn {k, _v} -> k end)
     |> Enum.join("")
 
-    coda = @phonemes
+    coda = phonemic_inventory
     |> Enum.filter(fn {_phoneme, features} -> features[:sonority] < 15 end)
     |> Enum.take_random(Enum.random(0..3))
     |> Enum.sort(&(Conlang.sonorance(&1) >= Conlang.sonorance(&2)))
